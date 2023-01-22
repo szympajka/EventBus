@@ -1,6 +1,7 @@
 export type StageManagerEvent = {
+	name: string,
 	type: string
-	detail: unknown
+	detail?: unknown
 }
 
 export interface CustomEventListener<T> {

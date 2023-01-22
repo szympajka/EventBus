@@ -1,27 +1,25 @@
 import * as React from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
 import { stage } from '@/packages/eventbus';
-import { ToastCustomEvent } from './toastProvider';
+import { ToastCustomEvent, ToastCustomEventDetail } from './toastProvider';
 import './toast.css';
+import { useRegisterComponent } from './useStageEvent';
 
-export const Toast = ({ id }: { id: string }) => {
+export const Toast = ({ id, message }: ToastCustomEventDetail) => {
   const onOpenChange = () => {
     stage.emit<ToastCustomEvent>('removeToast', { detail: { id } })
   }
 
-  React.useEffect(() => {
-    stage.emit<ToastCustomEvent>('mountToast', { detail: { id }});
-
-    return () => {
-      stage.emit<ToastCustomEvent>('unmountToast', { detail: { id }});
-    }
-  }, [id])
+  useRegisterComponent<ToastCustomEvent>('Toast', { detail: { id }});
 
   return (
     <RadixToast.Root className="ToastRoot" defaultOpen onOpenChange={onOpenChange}>
       <RadixToast.Title className="ToastTitle">Scheduled: Catch up</RadixToast.Title>
       <RadixToast.Description asChild>
-        <code>{id}</code>
+        <div>
+          <code>{id}</code>
+          {message ? <code>{message}</code> : null}
+        </div>
       </RadixToast.Description>
       <RadixToast.Action className="ToastAction" asChild altText="Goto schedule to undo">
         <button className="Button small green">Undo</button>

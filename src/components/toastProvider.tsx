@@ -8,12 +8,15 @@ import { Toast } from "./toast";
 
 export type ToastCustomEventDetail = {
   id: string,
-  message: ReactNode
+  message?: ReactNode
 };
+
+export type useToastAddProps = Omit<ToastCustomEventDetail, 'id'>
 
 export type ToastCustomEventType = 'addToast' | 'removeToast' | 'mountToast' | 'unmountToast';
 
 export type ToastCustomEvent = {
+  name: 'Toast',
   detail: ToastCustomEventDetail,
   type: ToastCustomEventType,
 }
@@ -27,9 +30,9 @@ export function generateUEID(): string {
   return first + second;
 }
 
-export function useToast({ name }) {
-  const add = useCallback(() => {
-    stage.emit<ToastCustomEvent>('addToast', { detail: { id: generateUEID() } })
+export function useToast() {
+  const add = useCallback(({ message }: useToastAddProps) => {
+    stage.emit<ToastCustomEvent>('addToast', { detail: { id: generateUEID(), message } })
   }, []);
 
   const remove = useCallback((detail: ToastCustomEventDetail) => {
@@ -40,21 +43,21 @@ export function useToast({ name }) {
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Array<string>>([]);
+  const [toasts, setToasts] = useState<Array<ToastCustomEventDetail>>([]);
 
   useStageEvent<ToastCustomEvent>('addToast', ({ detail }) => {
-    setToasts((state) => state.concat([detail.id]));
+    setToasts((state) => state.concat([detail]));
   });
 
   useStageEvent<ToastCustomEvent>('removeToast', ({ detail }) => {
-    setToasts((state) => state.filter((t) => t !== detail.id));
+    setToasts((state) => state.filter((t) => t.id !== detail.id));
   });
 
   return (
-    <RadixToast.Provider swipeDirection="right">
+    <RadixToast.Provider swipeDirection="right" duration={1000}>
       {children}
-      {toasts.map((id) =>
-        <Toast key={id} id={id} />
+      {toasts.map(({ id, message }) =>
+        <Toast key={id} id={id} message={message} />
       )}
       <RadixToast.Viewport className="ToastViewport" />
     </RadixToast.Provider>

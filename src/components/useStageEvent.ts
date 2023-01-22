@@ -1,4 +1,4 @@
-import { CustomEventListener, stage } from "@/packages/eventbus";
+import { CustomEventListener, stage, StageManagerEvent } from "@/packages/eventbus";
 import { useEffect, useRef } from "react";
 import { ToastCustomEvent } from "./toastProvider";
 
@@ -12,7 +12,7 @@ const useStaticDependencyRef = <T>(handler: T) => {
   return handleRef;
 }
 
-export const useStageEvent = <E extends ToastCustomEvent>(type: E['type'], handler: CustomEventListener<E['detail']>) => {
+export const useStageEvent = <E extends StageManagerEvent>(type: E['type'], handler: CustomEventListener<E['detail']>) => {
   const staticHandle = useStaticDependencyRef(handler);
 
   useEffect(() => {
@@ -24,4 +24,15 @@ export const useStageEvent = <E extends ToastCustomEvent>(type: E['type'], handl
       stage.off(type, current);
     }
   }, [type, staticHandle])
+}
+
+export const useRegisterComponent = <E extends StageManagerEvent>(name: E['name'], eventInitDict?: CustomEventInit<E['detail']> ) => {
+  useEffect(() => {
+    stage.emit<E>(`mount${name}`, eventInitDict);
+
+    return () => {
+      stage.emit<E>(`unmount${name}`, eventInitDict);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }
