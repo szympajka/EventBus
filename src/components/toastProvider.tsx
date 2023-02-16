@@ -2,7 +2,7 @@
 import { ReactNode, useCallback, useEffect, useId, useState } from "react";
 
 import * as RadixToast from '@radix-ui/react-toast';
-import { stage } from "@/packages/eventbus";
+import { useStage } from "@/packages/eventbus";
 import { useStageEvent } from "./useStageEvent";
 import { Toast } from "./toast";
 
@@ -13,9 +13,12 @@ export type ToastCustomEventDetail = {
 
 export type useToastAddProps = Omit<ToastCustomEventDetail, 'id'>
 
-export type ToastCustomEventType = 'addToast' | 'removeToast' | 'mountToast' | 'unmountToast';
+export type ToastCustomEventType = 'add' | 'remove' | 'mount' | 'unmount';
+
+export const ToastIdentity = Symbol('Toast');
 
 export type ToastCustomEvent = {
+  identity: typeof ToastIdentity;
   name: 'Toast',
   detail: ToastCustomEventDetail,
   type: ToastCustomEventType,
@@ -31,13 +34,15 @@ export function generateUEID(): string {
 }
 
 export function useToast() {
+  const stage = useStage<ToastCustomEvent>(ToastIdentity);
+
   const add = useCallback(({ message }: useToastAddProps) => {
-    stage.emit<ToastCustomEvent>('addToast', { detail: { id: generateUEID(), message } })
-  }, []);
+    stage.emit('add', { detail: { id: generateUEID(), message } })
+  }, [stage]);
 
   const remove = useCallback((detail: ToastCustomEventDetail) => {
-    stage.emit<ToastCustomEvent>('removeToast', { detail })
-  }, []);
+    stage.emit('remove', { detail })
+  }, [stage]);
 
   return { add, remove }
 }
@@ -45,11 +50,11 @@ export function useToast() {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Array<ToastCustomEventDetail>>([]);
 
-  useStageEvent<ToastCustomEvent>('addToast', ({ detail }) => {
+  useStageEvent<ToastCustomEvent>(ToastIdentity, 'add', ({ detail }) => {
     setToasts((state) => state.concat([detail]));
   });
 
-  useStageEvent<ToastCustomEvent>('removeToast', ({ detail }) => {
+  useStageEvent<ToastCustomEvent>(ToastIdentity, 'remove', ({ detail }) => {
     setToasts((state) => state.filter((t) => t.id !== detail.id));
   });
 
