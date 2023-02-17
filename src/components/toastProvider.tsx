@@ -2,8 +2,8 @@
 import { ReactNode, useCallback, useEffect, useId, useState } from "react";
 
 import * as RadixToast from '@radix-ui/react-toast';
-import { useStage } from "@/packages/eventbus";
-import { useStageEvent } from "./useStageEvent";
+import { useEventBus } from "@/packages/eventbus";
+import { useEventBusEvent } from "./useEventBusEvent";
 import { Toast } from "./toast";
 
 export type ToastCustomEventDetail = {
@@ -34,7 +34,7 @@ export function generateUEID(): string {
 }
 
 export function useToast() {
-  const stage = useStage<ToastCustomEvent>(ToastIdentity);
+  const stage = useEventBus<ToastCustomEvent>(ToastIdentity);
 
   const add = useCallback(({ message }: useToastAddProps) => {
     stage.emit('add', { detail: { id: generateUEID(), message } })
@@ -50,11 +50,11 @@ export function useToast() {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Array<ToastCustomEventDetail>>([]);
 
-  useStageEvent<ToastCustomEvent>(ToastIdentity, 'add', ({ detail }) => {
+  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'add', ({ detail }) => {
     setToasts((state) => state.concat([detail]));
   });
 
-  useStageEvent<ToastCustomEvent>(ToastIdentity, 'remove', ({ detail }) => {
+  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'remove', ({ detail }) => {
     setToasts((state) => state.filter((t) => t.id !== detail.id));
   });
 

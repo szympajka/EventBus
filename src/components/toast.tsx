@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
-import { useStage } from '@/packages/eventbus';
+import { useEventBus } from '@/packages/eventbus';
 import { ToastCustomEvent, ToastCustomEventDetail, ToastIdentity } from './toastProvider';
 import './toast.css';
-import { useRegisterComponent } from './useStageEvent';
+import { useRegisterComponent } from './useEventBusEvent';
 
 export const Toast = ({ id, message }: ToastCustomEventDetail) => {
-  const stage = useStage<ToastCustomEvent>(ToastIdentity);
+  const stage = useEventBus<ToastCustomEvent>(ToastIdentity);
 
   const onOpenChange = () => {
     stage.emit('remove', { detail: { id } })

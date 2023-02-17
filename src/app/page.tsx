@@ -2,16 +2,16 @@
 import { Button, ButtonCustomEvent, ButtonIdentity } from "@/components/button";
 
 import { ToastCustomEvent, ToastIdentity, ToastProvider, useToast } from "@/components/toastProvider";
-import { useStageEvent } from "@/components/useStageEvent";
+import { useEventBusEvent } from "@/components/useEventBusEvent";
 
 export default function Home() {
   const { add } = useToast();
 
-  useStageEvent<ToastCustomEvent>(ToastIdentity, 'mount', ({ detail }) => console.log('mount', detail));
-  useStageEvent<ButtonCustomEvent>(ButtonIdentity, 'mount', () => console.log('mounted'));
-  useStageEvent<ToastCustomEvent>(ToastIdentity, 'unmount', ({ detail }) => console.log('unmount', detail));
-  useStageEvent<ButtonCustomEvent>(ButtonIdentity,'unmount', () => console.log('unmounted'));
-  useStageEvent<ButtonCustomEvent>(ButtonIdentity, 'onClick', ({ detail }) => console.log('onClick', detail));
+  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'mount', ({ detail }) => console.log('mount', detail));
+  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity, 'mount', () => console.log('mounted'));
+  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'unmount', ({ detail }) => console.log('unmount', detail));
+  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity,'unmount', () => console.log('unmounted'));
+  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity, 'onClick', ({ detail }) => console.log('onClick', detail));
 
   return (
     <ToastProvider>

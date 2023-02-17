@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-export type StageManagerEvent<D = unknown> = {
+export type EventBusEvent<D = unknown> = {
 	identity: Symbol,
 	name: string,
 	type: string
@@ -11,7 +11,7 @@ export interface CustomEventListener<T> {
 	(evt: CustomEvent<T>): void;
 }
 
-export class StageManager extends EventTarget {
+export class EventBus extends EventTarget {
 	#prefix: string;
 
 	constructor (prefix: string) {
@@ -20,32 +20,31 @@ export class StageManager extends EventTarget {
 		this.#prefix = prefix;
 	}
 
-	#resolveEventName<E extends StageManagerEvent>(identity: E['identity'], type: E['type']) {
+	#resolveEventName<E extends EventBusEvent>(identity: E['identity'], type: E['type']) {
 		return `${this.#prefix}.${identity.toString()}.${type}`
 	}
 
-	emit<E extends StageManagerEvent>(identity: E['identity'], type: E['type'], eventInitDict?: CustomEventInit<E['detail']> ) {
-		console.log(this.#resolveEventName(identity, type));
+	emit<E extends EventBusEvent>(identity: E['identity'], type: E['type'], eventInitDict?: CustomEventInit<E['detail']> ) {
 		this.dispatchEvent(new CustomEvent(this.#resolveEventName(identity, type), eventInitDict))
 	}
 
-	on<E extends StageManagerEvent>(identity: E['identity'], type: E['type'], handler: CustomEventListener<E['detail']>, opts?: AddEventListenerOptions) {
+	on<E extends EventBusEvent>(identity: E['identity'], type: E['type'], handler: CustomEventListener<E['detail']>, opts?: AddEventListenerOptions) {
 		// @ts-expect-error
 		this.addEventListener(this.#resolveEventName(identity, type), handler, opts);
 	}
 
-	off<E extends StageManagerEvent>(identity: E['identity'], type: E['type'], handler: CustomEventListener<E['detail']>, opts?: EventListenerOptions) {
+	off<E extends EventBusEvent>(identity: E['identity'], type: E['type'], handler: CustomEventListener<E['detail']>, opts?: EventListenerOptions) {
 		// @ts-expect-error
 		this.removeEventListener(this.#resolveEventName(identity, type), handler, opts)
 	}
 }
 
-const stage = new StageManager('thc');
+const eventBus = new EventBus('thc');
 
-export const useStage = <E extends StageManagerEvent>(identity: Symbol) => {
+export const useEventBus = <E extends EventBusEvent>(identity: Symbol) => {
 	return useMemo(() => ({
-		emit: (type: E['type'], eventInitDict?: CustomEventInit<E['detail']>) => stage.emit<E>(identity, type, eventInitDict),
-		on: (type: E['type'], handler: CustomEventListener<E['detail']>, opts?: AddEventListenerOptions) => stage.on<E>(identity, type, handler, opts),
-		off: (type: E['type'], handler: CustomEventListener<E['detail']>, opts?: EventListenerOptions) => stage.on<E>(identity, type, handler, opts),
+		emit: (type: E['type'], eventInitDict?: CustomEventInit<E['detail']>) => eventBus.emit<E>(identity, type, eventInitDict),
+		on: (type: E['type'], handler: CustomEventListener<E['detail']>, opts?: AddEventListenerOptions) => eventBus.on<E>(identity, type, handler, opts),
+		off: (type: E['type'], handler: CustomEventListener<E['detail']>, opts?: EventListenerOptions) => eventBus.on<E>(identity, type, handler, opts),
 	}), [identity])
 }

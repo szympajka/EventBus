@@ -1,6 +1,6 @@
-import { useStage } from '@/packages/eventbus';
+import { useEventBus } from '@/packages/eventbus';
 import { ComponentProps, useEffect, MouseEvent } from 'react';
-import { useRegisterComponent } from './useStageEvent';
+import { useRegisterComponent } from './useEventBusEvent';
 
 type ButtonProps = ComponentProps<'button'> & {
   tracking: {
@@ -17,7 +17,7 @@ export type ButtonCustomEvent = {
 };
 
 export const Button = (props: ButtonProps) => {
-  const stage = useStage<ButtonCustomEvent>(ButtonIdentity);
+  const stage = useEventBus<ButtonCustomEvent>(ButtonIdentity);
 
   useRegisterComponent<ButtonCustomEvent>(ButtonIdentity, 'Button');
 
