@@ -1,5 +1,5 @@
-import { useEventBus } from '@/packages/eventbus';
-import { ComponentProps, useEffect, MouseEvent } from 'react';
+import { useEventBus } from '@/packages/EventBus.hooks';
+import { ComponentProps, useRef } from 'react';
 import { useRegisterComponent } from './useEventBusEvent';
 
 type ButtonProps = ComponentProps<'button'> & {
@@ -8,18 +8,11 @@ type ButtonProps = ComponentProps<'button'> & {
   }
 };
 
-export const ButtonIdentity = Symbol('Button');
-
-export type ButtonCustomEvent = {
-  identity: typeof ButtonIdentity,
-  name: 'Button'
-  type: 'mount' | 'unmount' | 'onClick',
-};
-
 export const Button = (props: ButtonProps) => {
-  const stage = useEventBus<ButtonCustomEvent>(ButtonIdentity);
+  const ref = useRef<HTMLButtonElement>(null);
+  const stage = useEventBus();
 
-  useRegisterComponent<ButtonCustomEvent>(ButtonIdentity, 'Button');
+  useRegisterComponent(ref);
 
   const { onClick: onClickFromParams, ...rest } = props;
 
@@ -30,6 +23,6 @@ export const Button = (props: ButtonProps) => {
   }
 
   return (
-    <button {...rest} onClick={onClick}>Label</button>
+    <button {...rest} ref={ref} onClick={onClick}>Label</button>
   )
 }

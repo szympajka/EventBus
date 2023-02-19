@@ -1,21 +1,22 @@
 import * as React from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
-import { useEventBus } from '@/packages/eventbus';
-import { ToastCustomEvent, ToastCustomEventDetail, ToastIdentity } from './toastProvider';
-import './toast.css';
-import { useRegisterComponent } from './useEventBusEvent';
+import './Toast.css';
+import { useRegisterComponent } from '../useEventBusEvent';
+import { ToastCustomEvent, ToastCustomEventDetail } from './Toast.types';
+import { useEventBus } from '@/packages/EventBus.hooks';
 
 export const Toast = ({ id, message }: ToastCustomEventDetail) => {
-  const stage = useEventBus<ToastCustomEvent>(ToastIdentity);
+  const ref = React.useRef(null);
+  const stage = useEventBus<ToastCustomEvent>();
 
   const onOpenChange = () => {
     stage.emit('remove', { detail: { id } })
   }
 
-  useRegisterComponent<ToastCustomEvent>(ToastIdentity, 'Toast', { detail: { id }});
+  useRegisterComponent<ToastCustomEvent>(ref, { detail: { id }});
 
   return (
-    <RadixToast.Root className="ToastRoot" defaultOpen onOpenChange={onOpenChange}>
+    <RadixToast.Root ref={ref} className="ToastRoot" defaultOpen onOpenChange={onOpenChange}>
       <RadixToast.Title className="ToastTitle">Scheduled: Catch up</RadixToast.Title>
       <RadixToast.Description asChild>
         <div>

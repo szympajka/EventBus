@@ -1,17 +1,16 @@
 'use client'
-import { Button, ButtonCustomEvent, ButtonIdentity } from "@/components/button";
+import { Button } from "@/components/button";
+import { useToast } from "@/components/Toast/Toast.hooks";
+import { ToastProvider } from "@/components/Toast/ToastProvider";
 
-import { ToastCustomEvent, ToastIdentity, ToastProvider, useToast } from "@/components/toastProvider";
 import { useEventBusEvent } from "@/components/useEventBusEvent";
 
 export default function Home() {
   const { add } = useToast();
 
-  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'mount', ({ detail }) => console.log('mount', detail));
-  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity, 'mount', () => console.log('mounted'));
-  useEventBusEvent<ToastCustomEvent>(ToastIdentity, 'unmount', ({ detail }) => console.log('unmount', detail));
-  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity,'unmount', () => console.log('unmounted'));
-  useEventBusEvent<ButtonCustomEvent>(ButtonIdentity, 'onClick', ({ detail }) => console.log('onClick', detail));
+  useEventBusEvent('mount', (e) => console.log('mount', e));
+  useEventBusEvent('unmount', (e) => console.log('unmount', e));
+  useEventBusEvent('onClick', (e) => console.log('onClick', e));
 
   return (
     <ToastProvider>
