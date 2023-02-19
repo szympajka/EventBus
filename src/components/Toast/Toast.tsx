@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
 import './Toast.css';
-import { useRegisterComponent } from '../useEventBusEvent';
+import { useEventBusEvent, useRegisterComponent } from '../useEventBusEvent';
 import { ToastCustomEvent, ToastCustomEventDetail } from './Toast.types';
 import { useEventBus } from '@/packages/EventBus.hooks';
+import { keyboardEventBus } from '../keyboard';
 
 export const Toast = ({ id, message }: ToastCustomEventDetail) => {
   const ref = React.useRef(null);

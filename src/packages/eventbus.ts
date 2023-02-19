@@ -27,5 +27,5 @@ export class EventBus extends EventTarget {
 	}
 }
 
-export const $eventBus = new EventBus('thc');
+export const $eventBus = new EventBus('thc-components');
 

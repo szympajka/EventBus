@@ -6,7 +6,7 @@ export type Prettify<T> = {
 	[K in keyof T]: T[K]
 } & {}
 
-export type DefaultEventType = 'mount' | 'unmount' | keyof DOMAttributes<Element>;
+export type DefaultEventType = 'mount' | 'unmount' | keyof DOMAttributes<Element> | string;
 
 export type EventBusEventDefaults = {
 	type: DefaultEventType;
